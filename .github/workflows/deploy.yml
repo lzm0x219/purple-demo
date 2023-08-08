@@ -1,0 +1,75 @@
+name: Deploy
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "项目环境"
+        default: "all"
+        type: choice
+        options:
+          - dev
+          - stage
+          - all
+        required: true
+jobs:
+  deploy:
+    name: Deploy To Servers
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+      - name: Setup Rsync
+        uses: GuillaumeFalourd/setup-rsync@v1.1
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2.4.0
+        with:
+          version: latest
+          run_install: false
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: 构建项目
+        if: ${{ success() }}
+        run: pnpm build
+
+      - name: 部署开发环境
+        if: ${{ success() && (inputs.environment == 'dev' || inputs.environment == 'all') }}
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SERVER_KEY }}
+          ARGS: "-avzr --delete"
+          SOURCE: "dist/"
+          REMOTE_PORT: ${{ secrets.SERVER_DEV_PORT }}
+          REMOTE_HOST: ${{ secrets.SERVER_DEV_HOST }}
+          REMOTE_USER: ${{ secrets.SERVER_DEV_USER }}
+          TARGET: "/data/www/wwwroot/xsy-dev.weizhijiacn.cn/"
+          EXCLUDE: "/dist/, /node_modules/"
+      - name: 部署预发环境
+        if: ${{ success() && (inputs.environment == 'stage' || inputs.environment == 'all') }}
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SERVER_KEY }}
+          ARGS: "-avzr --delete"
+          SOURCE: "dist/"
+          REMOTE_PORT: ${{ secrets.SERVER_STAGE_PORT }}
+          REMOTE_HOST: ${{ secrets.SERVER_STAGE_HOST }}
+          REMOTE_USER: ${{ secrets.SERVER_STAGE_USER }}
+          TARGET: "/data/www/wwwroot/xsy-pre.weizhijiacn.cn/"
+          EXCLUDE: "/dist/, /node_modules/"
