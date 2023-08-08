@@ -1,0 +1,42 @@
+{
+  "name": "purple-demo",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc && vite build",
+    "dev": "vite",
+    "preinstall": "npx only-allow pnpm",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "prepare": "is-ci || husky install",
+    "preview": "vite preview"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,cjs}": [
+      "eslint --report-unused-disable-directives --max-warnings 0"
+    ],
+    "*.{md,html,css,json,yml}": "prettier --write",
+    "!(*pnpm-lock).yaml": "prettier --write",
+    "package.json": "pnpm sort-package-json"
+  },
+  "dependencies": {
+    "pixi.js": "7.3.0-rc"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "6.2.1",
+    "@typescript-eslint/parser": "6.2.1",
+    "eslint": "8.46.0",
+    "eslint-config-prettier": "9.0.0",
+    "husky": "8.0.3",
+    "is-ci": "3.0.1",
+    "lightningcss": "1.21.5",
+    "lint-staged": "13.2.3",
+    "prettier": "3.0.1",
+    "prettier-plugin-packagejson": "2.4.5",
+    "sort-package-json": "2.5.1",
+    "typescript": "5.1.6",
+    "vite": "4.4.8",
+    "vite-plugin-mkcert": "1.16.0",
+    "vite-tsconfig-paths": "4.2.0"
+  }
+}
