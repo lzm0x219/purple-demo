@@ -35,7 +35,7 @@
     "prettier-plugin-packagejson": "2.4.5",
     "sort-package-json": "2.5.1",
     "typescript": "5.1.6",
-    "vite": "4.4.8",
+    "vite": "4.4.9",
     "vite-plugin-mkcert": "1.16.0",
     "vite-tsconfig-paths": "4.2.0"
   }
