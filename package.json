@@ -20,7 +20,7 @@
     "package.json": "pnpm sort-package-json"
   },
   "dependencies": {
-    "pixi.js": "7.3.0-rc",
+    "pixi.js": "7.3.0-rc.2",
     "ress": "5.0.2"
   },
   "devDependencies": {
